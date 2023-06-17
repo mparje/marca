@@ -60,12 +60,13 @@ if st.button("Analizar"):
             negativos = sum(p < 0 for p in polaridades)
             neutrales = sum(p == 0 for p in polaridades)
             
-            # Crear la gráfica de pie
+            # Crear la gráfica de barras
             labels = ["Positivos", "Negativos", "Neutrales"]
-            sizes = [positivos, negativos, neutrales]
-            plt.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=90)
-            plt.axis("equal")  # Hace que el gráfico de pie sea circular
+            values = [positivos, negativos, neutrales]
+            plt.bar(labels, values)
             plt.title("Sentimiento de los tweets")
+            plt.xlabel("Sentimiento")
+            plt.ylabel("Cantidad")
             
             # Mostrar la gráfica en Streamlit
             st.pyplot(plt)
