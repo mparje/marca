@@ -1,7 +1,7 @@
 import streamlit as st
+import tweepy
 from datetime import datetime
 from textblob import TextBlob
-from pygooglenews import GoogleNews
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -10,24 +10,32 @@ def analizar_sentimiento(texto):
     subjetividad = blob.sentiment.subjectivity
     return polaridad, subjetividad
 
-# Función para buscar información sobre una marca en Google News
+# Función para buscar información sobre una marca en Twitter
 def buscar_informacion_marca(marca, fecha):
-    gn = GoogleNews()
-    results = gn.search(marca, when=fecha.strftime('%Y-%m-%d'))
+    # Configuración de las credenciales de Twitter API
+    consumer_key = "TU_CONSUMER_KEY"
+    consumer_secret = "TU_CONSUMER_SECRET"
+    access_token = "TU_ACCESS_TOKEN"
+    access_token_secret = "TU_ACCESS_TOKEN_SECRET"
+    
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tweepy.API(auth)
 
     resultados = []
-
-    for entry in results['entries']:
-        # Obtener la fecha del artículo y convertirla a formato datetime
-        fecha_articulo = datetime.strptime(entry['published'], "%a, %d %b %Y %H:%M:%S %Z")
+    
+    # Realizar la búsqueda en Twitter
+    tweets = api.search(q=marca, count=100, lang="es", tweet_mode="extended")
+    
+    for tweet in tweets:
+        # Obtener la fecha del tweet y convertirla a formato datetime
+        fecha_tweet = tweet.created_at.date()
         
-        # Verificar si el artículo se publicó en la fecha especificada
-        if fecha_articulo.date() == fecha:
-            # Verificar si la marca aparece en el título o el contenido del artículo
-            if marca.lower() in entry['title'].lower() or marca.lower() in entry['summary'].lower():
-                texto = entry['title'] + " " + entry['summary']
-                polaridad, subjetividad = analizar_sentimiento(texto)
-                resultados.append({"fuente": entry['source']['title'], "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
+        # Verificar si el tweet se publicó en la fecha especificada
+        if fecha_tweet == fecha:
+            texto = tweet.full_text
+            polaridad, subjetividad = analizar_sentimiento(texto)
+            resultados.append({"usuario": tweet.user.screen_name, "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
 
     return resultados
 
@@ -42,7 +50,7 @@ if st.button("Analizar"):
         if resultados:
             st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
             for resultado in resultados:
-                st.write(f"Fuente: {resultado['fuente']}")
+                st.write(f"Usuario: {resultado['usuario']}")
                 st.write(f"Texto: {resultado['texto']}")
                 st.write(f"Polaridad: {resultado['polaridad']}")
                 st.write(f"Subjetividad: {resultado['subjetividad']}")
