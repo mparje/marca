@@ -13,20 +13,19 @@ def analizar_sentimiento(texto):
 # Función para buscar información sobre una marca en Twitter
 def buscar_informacion_marca(marca, fecha):
     # Acceder a las credenciales de Twitter API desde los secrets de Streamlit
-    consumer_key = "fr9FM4cAAEoMpvak8fKk5kDOp"
-    consumer_secret = "7P025Egxnib5dogMvOLgdo1uHJPJg2lx98Rvg3XYvIjf4Eo59u"
-    access_token = "113763054-GQQ7L2Pa9yfhX386G0khrBhecdTMgIgpadwGglDv"
-    access_token_secret = "o5ggZAOJrq1AotVlg2gGJ7MpVpHnh0eg4xYsKX2EsbFvT"
+    consumer_key = st.secrets["twitter"]["consumer_key"]
+    consumer_secret = st.secrets["twitter"]["consumer_secret"]
+    access_token = st.secrets["twitter"]["access_token"]
+    access_token_secret = st.secrets["twitter"]["access_token_secret"]
     
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
 
-    resultados = []
+    resultados = {"Positivo": 0, "Negativo": 0, "Neutral": 0}
     
     # Realizar la búsqueda en Twitter
     tweets = api.search(q=marca, count=100, lang="es", tweet_mode="extended")
-
     
     for tweet in tweets:
         # Obtener la fecha del tweet y convertirla a formato datetime
