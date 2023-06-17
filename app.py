@@ -2,6 +2,7 @@ import streamlit as st
 import tweepy
 from datetime import datetime
 from textblob import TextBlob
+import matplotlib.pyplot as plt
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -23,6 +24,8 @@ def buscar_informacion_marca(marca, fecha):
     api = tweepy.API(auth)
 
     resultados = []
+    polaridades = []
+    subjetividades = []
     
     # Realizar la búsqueda en Twitter
     tweets = api.search_tweets(q=marca, count=100, lang="es", tweet_mode="extended")
@@ -36,6 +39,24 @@ def buscar_informacion_marca(marca, fecha):
             texto = tweet.full_text
             polaridad, subjetividad = analizar_sentimiento(texto)
             resultados.append({"usuario": tweet.user.screen_name, "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
+            polaridades.append(polaridad)
+            subjetividades.append(subjetividad)
+
+    # Gráfico de polaridades
+    plt.figure(figsize=(8, 4))
+    plt.hist(polaridades, bins=10, range=(-1, 1), alpha=0.7, color='blue')
+    plt.xlabel('Polaridad')
+    plt.ylabel('Frecuencia')
+    plt.title('Distribución de Polaridades')
+    st.pyplot()
+
+    # Gráfico de subjetividades
+    plt.figure(figsize=(8, 4))
+    plt.hist(subjetividades, bins=10, range=(0, 1), alpha=0.7, color='green')
+    plt.xlabel('Subjetividad')
+    plt.ylabel('Frecuencia')
+    plt.title('Distribución de Subjetividades')
+    st.pyplot()
 
     return resultados
 
