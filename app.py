@@ -69,6 +69,13 @@ if st.button("Analizar"):
             
             # Mostrar la gráfica en Streamlit
             st.pyplot(plt)
+            
+            # Mostrar los tweets
+            st.write("Tweets encontrados:")
+            for index, row in df.iterrows():
+                st.write(f"Usuario: @{row['Usuario']}")
+                st.write(f"Tweet: {row['Texto']}")
+                st.write("----")
         else:
             st.write("No se encontraron resultados para la marca especificada en la fecha actual.")
     else:
