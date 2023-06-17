@@ -1,7 +1,6 @@
 import streamlit as st
 import tweepy
 from textblob import TextBlob
-import matplotlib.pyplot as plt
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -49,19 +48,6 @@ if st.button("Analizar"):
                 st.write(f"Polaridad: {resultado['polaridad']}")
                 st.write(f"Subjetividad: {resultado['subjetividad']}")
                 st.write("---")
-
-            # Generar la gráfica de pastel
-            polaridades = [resultado['polaridad'] for resultado in resultados]
-            labels = ['Positivo', 'Neutral', 'Negativo']
-            values = [len([p for p in polaridades if p > 0]),
-                      len([p for p in polaridades if p == 0]),
-                      len([p for p in polaridades if p < 0])]
-            
-            fig, ax = plt.subplots()
-            ax.pie(values, labels=labels, autopct='%1.1f%%')
-            ax.set_title("Análisis de Sentimientos")
-            
-            st.pyplot(fig)
         else:
             st.write("No se encontraron resultados para la marca especificada.")
     else:
