@@ -42,21 +42,7 @@ def buscar_informacion_marca(marca, fecha):
             polaridades.append(polaridad)
             subjetividades.append(subjetividad)
 
-    # Gráfico de polaridades
-    fig, ax = plt.subplots()
-    polaridades_etiquetas = ["Negativo", "Neutral", "Positivo"]
-    ax.pie([polaridades.count(-1), polaridades.count(0), polaridades.count(1)], labels=polaridades_etiquetas, autopct='%1.1f%%', startangle=90)
-    ax.set_title('Distribución de Polaridades')
-    st.pyplot(fig)
-
-    # Gráfico de subjetividades
-    fig, ax = plt.subplots()
-    subjetividades_etiquetas = ["Objetivo", "Subjetivo"]
-    ax.pie([subjetividades.count(0), subjetividades.count(1)], labels=subjetividades_etiquetas, autopct='%1.1f%%', startangle=90)
-    ax.set_title('Distribución de Subjetividades')
-    st.pyplot(fig)
-
-    return resultados
+    return resultados, polaridades, subjetividades
 
 # Configuración de la aplicación Streamlit
 st.title("Análisis de Sentimientos y Búsqueda de Información de Marcas")
@@ -65,7 +51,7 @@ fecha = st.date_input("Seleccione una fecha:")
 
 if st.button("Analizar"):
     if marca:
-        resultados = buscar_informacion_marca(marca, fecha)
+        resultados, polaridades, subjetividades = buscar_informacion_marca(marca, fecha)
         if resultados:
             st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
             for resultado in resultados:
@@ -74,6 +60,21 @@ if st.button("Analizar"):
                 st.write(f"Polaridad: {resultado['polaridad']}")
                 st.write(f"Subjetividad: {resultado['subjetividad']}")
                 st.write("---")
+            
+            # Gráfico de polaridades
+            fig, ax = plt.subplots()
+            polaridades_etiquetas = ["Negativo", "Neutral", "Positivo"]
+            ax.pie([polaridades.count(-1), polaridades.count(0), polaridades.count(1)], labels=polaridades_etiquetas, autopct='%1.1f%%', startangle=90)
+            ax.set_title('Distribución de Polaridades')
+            st.pyplot(fig)
+
+            # Gráfico de subjetividades
+            fig, ax = plt.subplots()
+            subjetividades_etiquetas = ["Objetivo", "Subjetivo"]
+            ax.pie([subjetividades.count(0), subjetividades.count(1)], labels=subjetividades_etiquetas, autopct='%1.1f%%', startangle=90)
+            ax.set_title('Distribución de Subjetividades')
+            st.pyplot(fig)
+            
         else:
             st.write("No se encontraron resultados para la marca y fecha especificadas.")
     else:
