@@ -25,7 +25,8 @@ def buscar_informacion_marca(marca, fecha):
     resultados = []
     
     # Realizar la búsqueda en Twitter
-    tweets = api.search_tweets(q=marca, count=100, lang="es", tweet_mode="extended")
+    tweets = api.search(q=marca, count=100, lang="es", tweet_mode="extended")
+
     
     for tweet in tweets:
         # Obtener la fecha del tweet y convertirla a formato datetime
