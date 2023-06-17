@@ -36,7 +36,7 @@ def buscar_informacion_marca(marca, fecha):
         if fecha_tweet == fecha:
             texto = tweet.full_text
             polaridad, subjetividad = analizar_sentimiento(texto)
-            resultados.append({"usuario": tweet.user.screen_name, "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
+            resultados.append({"Usuario": tweet.user.screen_name, "Texto": texto, "Polaridad": polaridad, "Subjetividad": subjetividad})
 
     return resultados
 
@@ -49,9 +49,9 @@ if st.button("Analizar"):
     if marca:
         resultados = buscar_informacion_marca(marca, fecha)
         if resultados:
-            st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
             df = pd.DataFrame(resultados)
-            st.table(df)
+            st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
+            st.dataframe(df)
         else:
             st.write("No se encontraron resultados para la marca y fecha especificadas.")
     else:
