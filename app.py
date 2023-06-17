@@ -12,11 +12,11 @@ def analizar_sentimiento(texto):
 
 # Función para buscar información sobre una marca en Twitter
 def buscar_informacion_marca(marca, fecha):
-    # Acceder a las credenciales de Twitter API desde los secrets de Streamlit
-    consumer_key = st.secrets["twitter"]["consumer_key"]
-    consumer_secret = st.secrets["twitter"]["consumer_secret"]
-    access_token = st.secrets["twitter"]["access_token"]
-    access_token_secret = st.secrets["twitter"]["access_token_secret"]
+    # Configuración de las credenciales de Twitter API
+    consumer_key = "fr9FM4cAAEoMpvak8fKk5kDOp"
+    consumer_secret = "7P025Egxnib5dogMvOLgdo1uHJPJg2lx98Rvg3XYvIjf4Eo59u"
+    access_token = "113763054-GQQ7L2Pa9yfhX386G0khrBhecdTMgIgpadwGglDv"
+    access_token_secret = "o5ggZAOJrq1AotVlg2gGJ7MpVpHnh0eg4xYsKX2EsbFvT"
     
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
