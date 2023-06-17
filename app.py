@@ -1,7 +1,7 @@
 import streamlit as st
+import feedparser
 from datetime import datetime
 from textblob import TextBlob
-import requests
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -12,36 +12,35 @@ def analizar_sentimiento(texto):
 
 # Función para buscar información sobre una marca en fuentes confiables
 def buscar_informacion_marca(marca, fecha):
-    # Aquí puedes incluir tu lógica para buscar información en las fuentes confiables mencionadas
-    # y obtener los resultados para la marca y fecha específica
-    # En este ejemplo, usaremos una solicitud GET a una API ficticia para obtener los resultados
-    
-    # Fuentes confiables
+    # Configuración de los feeds RSS de las fuentes confiables
     fuentes = [
-        {"nombre": "Xataka", "url": "https://www.xataka.com/"},
-        {"nombre": "Gizmodo", "url": "https://es.gizmodo.com/"},
-        {"nombre": "The Verge", "url": "https://www.theverge.com/"},
-        {"nombre": "Engadget", "url": "https://www.engadget.com/"},
-        {"nombre": "Digital Trends", "url": "https://www.digitaltrends.com/"}
+        {"nombre": "Xataka", "url": "https://www.xataka.com/rss2"},
+        {"nombre": "Gizmodo", "url": "https://es.gizmodo.com/rss"},
+        {"nombre": "The Verge", "url": "https://www.theverge.com/rss/index.xml"},
+        {"nombre": "Engadget", "url": "https://www.engadget.com/rss.xml"},
+        {"nombre": "Digital Trends", "url": "https://www.digitaltrends.com/feed/"}
     ]
     
     resultados = []
     
     for fuente in fuentes:
-        url = f"{fuente['url']}buscar?marca={marca}&fecha={fecha}"
+        url = fuente['url']
         
         try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                noticias = response.json()
-                for noticia in noticias:
-                    texto = noticia['texto']
-                    polaridad, subjetividad = analizar_sentimiento(texto)
-                    resultados.append({"fuente": fuente['nombre'], "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
-            else:
-                print(f"Error al obtener resultados de la fuente: {fuente['nombre']}")
-        except requests.exceptions.RequestException as e:
-            print(f"Error de conexión con la fuente: {fuente['nombre']}, {e}")
+            feed = feedparser.parse(url)
+            for entry in feed.entries:
+                # Obtener la fecha del artículo y convertirla a formato datetime
+                fecha_articulo = datetime.strptime(entry.published, "%a, %d %b %Y %H:%M:%S %z")
+                
+                # Verificar si el artículo se publicó en la fecha especificada
+                if fecha_articulo.date() == fecha:
+                    # Verificar si la marca aparece en el título o el contenido del artículo
+                    if marca.lower() in entry.title.lower() or marca.lower() in entry.summary.lower():
+                        texto = entry.title + " " + entry.summary
+                        polaridad, subjetividad = analizar_sentimiento(texto)
+                        resultados.append({"fuente": fuente['nombre'], "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
+        except Exception as e:
+            print(f"Error al obtener resultados de la fuente: {fuente['nombre']}, {e}")
     
     return resultados
 
