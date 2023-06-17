@@ -1,7 +1,7 @@
 import streamlit as st
-import feedparser
 from datetime import datetime
 from textblob import TextBlob
+from pygooglenews import GoogleNews
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -10,38 +10,25 @@ def analizar_sentimiento(texto):
     subjetividad = blob.sentiment.subjectivity
     return polaridad, subjetividad
 
-# Función para buscar información sobre una marca en fuentes confiables
+# Función para buscar información sobre una marca en Google News
 def buscar_informacion_marca(marca, fecha):
-    # Configuración de los feeds RSS de las fuentes confiables
-    fuentes = [
-        {"nombre": "Xataka", "url": "https://www.xataka.com/rss2"},
-        {"nombre": "Gizmodo", "url": "https://es.gizmodo.com/rss"},
-        {"nombre": "The Verge", "url": "https://www.theverge.com/rss/index.xml"},
-        {"nombre": "Engadget", "url": "https://www.engadget.com/rss.xml"},
-        {"nombre": "Digital Trends", "url": "https://www.digitaltrends.com/feed/"}
-    ]
-    
+    gn = GoogleNews()
+    results = gn.search(marca, when=fecha.strftime('%Y-%m-%d'))
+
     resultados = []
-    
-    for fuente in fuentes:
-        url = fuente['url']
+
+    for entry in results['entries']:
+        # Obtener la fecha del artículo y convertirla a formato datetime
+        fecha_articulo = datetime.strptime(entry['published'], "%a, %d %b %Y %H:%M:%S %Z")
         
-        try:
-            feed = feedparser.parse(url)
-            for entry in feed.entries:
-                # Obtener la fecha del artículo y convertirla a formato datetime
-                fecha_articulo = datetime.strptime(entry.published, "%a, %d %b %Y %H:%M:%S %z")
-                
-                # Verificar si el artículo se publicó en la fecha especificada
-                if fecha_articulo.date() == fecha:
-                    # Verificar si la marca aparece en el título o el contenido del artículo
-                    if marca.lower() in entry.title.lower() or marca.lower() in entry.summary.lower():
-                        texto = entry.title + " " + entry.summary
-                        polaridad, subjetividad = analizar_sentimiento(texto)
-                        resultados.append({"fuente": fuente['nombre'], "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
-        except Exception as e:
-            print(f"Error al obtener resultados de la fuente: {fuente['nombre']}, {e}")
-    
+        # Verificar si el artículo se publicó en la fecha especificada
+        if fecha_articulo.date() == fecha:
+            # Verificar si la marca aparece en el título o el contenido del artículo
+            if marca.lower() in entry['title'].lower() or marca.lower() in entry['summary'].lower():
+                texto = entry['title'] + " " + entry['summary']
+                polaridad, subjetividad = analizar_sentimiento(texto)
+                resultados.append({"fuente": entry['source']['title'], "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
+
     return resultados
 
 # Configuración de la aplicación Streamlit
