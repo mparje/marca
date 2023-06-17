@@ -43,6 +43,10 @@ def buscar_informacion_marca(marca, fecha):
 
 # Configuración de la aplicación Streamlit
 st.title("Análisis de Sentimientos y Búsqueda de Información de Marcas")
+st.sidebar.title("Información")
+st.sidebar.write("Esta aplicación permite realizar análisis de sentimientos y búsqueda de información sobre marcas en Twitter. Simplemente ingrese el nombre de la marca y haga clic en 'Analizar'. La aplicación buscará tweets relacionados con la marca y mostrará el análisis de sentimientos de esos tweets.")
+st.sidebar.write("Autor: Moris Polanco")
+
 marca = st.text_input("Ingrese una marca:")
 
 if st.button("Analizar"):
