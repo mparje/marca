@@ -2,7 +2,6 @@ import streamlit as st
 import tweepy
 from datetime import datetime
 from textblob import TextBlob
-import pandas as pd
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -36,7 +35,7 @@ def buscar_informacion_marca(marca, fecha):
         if fecha_tweet == fecha:
             texto = tweet.full_text
             polaridad, subjetividad = analizar_sentimiento(texto)
-            resultados.append({"Usuario": tweet.user.screen_name, "Texto": texto, "Polaridad": polaridad, "Subjetividad": subjetividad})
+            resultados.append({"usuario": tweet.user.screen_name, "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
 
     return resultados
 
@@ -49,9 +48,13 @@ if st.button("Analizar"):
     if marca:
         resultados = buscar_informacion_marca(marca, fecha)
         if resultados:
-            df = pd.DataFrame(resultados)
             st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
-            st.dataframe(df)
+            for resultado in resultados:
+                st.write(f"Usuario: {resultado['usuario']}")
+                st.write(f"Texto: {resultado['texto']}")
+                st.write(f"Polaridad: {resultado['polaridad']}")
+                st.write(f"Subjetividad: {resultado['subjetividad']}")
+                st.write("---")
         else:
             st.write("No se encontraron resultados para la marca y fecha especificadas.")
     else:
