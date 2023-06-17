@@ -3,6 +3,7 @@ import tweepy
 from datetime import datetime
 from textblob import TextBlob
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -43,16 +44,32 @@ def buscar_informacion_marca(marca, fecha):
 # Configuración de la aplicación Streamlit
 st.title("Análisis de Sentimientos y Búsqueda de Información de Marcas")
 marca = st.text_input("Ingrese una marca:")
-fecha = st.date_input("Seleccione una fecha:")
 
 if st.button("Analizar"):
     if marca:
+        fecha = datetime.now().date()  # Obtenemos la fecha actual en lugar de solicitarla al usuario
         resultados = buscar_informacion_marca(marca, fecha)
         if resultados:
             df = pd.DataFrame(resultados)
             st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
             st.dataframe(df)
+            
+            # Calcular el número de tweets positivos, negativos y neutrales
+            polaridades = df["Polaridad"]
+            positivos = sum(p > 0 for p in polaridades)
+            negativos = sum(p < 0 for p in polaridades)
+            neutrales = sum(p == 0 for p in polaridades)
+            
+            # Crear la gráfica de pie
+            labels = ["Positivos", "Negativos", "Neutrales"]
+            sizes = [positivos, negativos, neutrales]
+            plt.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=90)
+            plt.axis("equal")  # Hace que el gráfico de pie sea circular
+            plt.title("Sentimiento de los tweets")
+            
+            # Mostrar la gráfica en Streamlit
+            st.pyplot(plt)
         else:
-            st.write("No se encontraron resultados para la marca y fecha especificadas.")
+            st.write("No se encontraron resultados para la marca especificada en la fecha actual.")
     else:
         st.write("Por favor, ingrese una marca.")
