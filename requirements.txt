@@ -2,3 +2,4 @@ streamlit
 textblob
 requests
 feedparser
+pygooglenews
