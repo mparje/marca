@@ -12,8 +12,8 @@ def analizar_sentimiento(texto):
     subjetividad = blob.sentiment.subjectivity
     return polaridad, subjetividad
 
-# Función para buscar información sobre una marca en Twitter
-def buscar_informacion_marca(marca, fecha):
+# Función para buscar información en Twitter y realizar el análisis de sentimientos
+def buscar_informacion_sentimientos(termino):
     # Configuración de las credenciales de Twitter API
     consumer_key = "fr9FM4cAAEoMpvak8fKk5kDOp"
     consumer_secret = "7P025Egxnib5dogMvOLgdo1uHJPJg2lx98Rvg3XYvIjf4Eo59u"
@@ -26,36 +26,33 @@ def buscar_informacion_marca(marca, fecha):
 
     resultados = []
     
+    # Obtener la fecha actual
+    fecha_actual = datetime.now().date()
+    
     # Realizar la búsqueda en Twitter
-    tweets = api.search_tweets(q=marca, count=100, lang="es", tweet_mode="extended")
+    tweets = api.search_tweets(q=termino, count=100, lang="es", tweet_mode="extended", until=fecha_actual)
     
     for tweet in tweets:
-        # Obtener la fecha del tweet y convertirla a formato datetime
-        fecha_tweet = tweet.created_at.date()
-        
-        # Verificar si el tweet se publicó en la fecha especificada
-        if fecha_tweet == fecha:
-            texto = tweet.full_text
-            polaridad, subjetividad = analizar_sentimiento(texto)
-            resultados.append({"Usuario": tweet.user.screen_name, "Texto": texto, "Polaridad": polaridad, "Subjetividad": subjetividad})
+        texto = tweet.full_text
+        polaridad, subjetividad = analizar_sentimiento(texto)
+        resultados.append({"Usuario": tweet.user.screen_name, "Texto": texto, "Polaridad": polaridad, "Subjetividad": subjetividad})
 
     return resultados
 
 # Configuración de la aplicación Streamlit
-st.title("Análisis de Sentimientos y Búsqueda de Información de Marcas")
+st.title("Análisis de Sentimientos sobre Términos en Twitter")
 st.sidebar.title("Información")
-st.sidebar.write("Esta aplicación permite realizar análisis de sentimientos y búsqueda de información sobre marcas en Twitter. Simplemente ingrese el nombre de la marca y haga clic en 'Analizar'. La aplicación buscará tweets relacionados con la marca y mostrará el análisis de sentimientos de esos tweets.")
+st.sidebar.write("Esta aplicación permite realizar un análisis de sentimientos sobre cualquier término en Twitter. Se basa en los tweets del día actual.")
 st.sidebar.write("Autor: Moris Polanco")
 
-marca = st.text_input("Ingrese una marca:")
+termino = st.text_input("Ingrese un término:")
 
 if st.button("Analizar"):
-    if marca:
-        fecha = datetime.now().date()  # Obtenemos la fecha actual en lugar de solicitarla al usuario
-        resultados = buscar_informacion_marca(marca, fecha)
+    if termino:
+        resultados = buscar_informacion_sentimientos(termino)
         if resultados:
             df = pd.DataFrame(resultados)
-            st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
+            st.write(f"Resultados encontrados para el término '{termino}' en el día de hoy:")
             st.dataframe(df)
             
             # Calcular el número de tweets positivos, negativos y neutrales
@@ -82,6 +79,6 @@ if st.button("Analizar"):
                 st.write(f"Tweet: {row['Texto']}")
                 st.write("----")
         else:
-            st.write("No se encontraron resultados para la marca especificada en la fecha actual.")
+            st.write("No se encontraron resultados para el término especificado en el día de hoy.")
     else:
-        st.write("Por favor, ingrese una marca.")
+        st.write("Por favor, ingrese un término.")
