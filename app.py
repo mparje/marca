@@ -43,20 +43,20 @@ def buscar_informacion_marca(marca, fecha):
             subjetividades.append(subjetividad)
 
     # Gráfico de polaridades
-    plt.figure(figsize=(8, 4))
-    plt.hist(polaridades, bins=10, range=(-1, 1), alpha=0.7, color='blue')
-    plt.xlabel('Polaridad')
-    plt.ylabel('Frecuencia')
-    plt.title('Distribución de Polaridades')
-    st.pyplot()
+    fig, ax = plt.subplots()
+    ax.hist(polaridades, bins=10, range=(-1, 1), alpha=0.7, color='blue')
+    ax.set_xlabel('Polaridad')
+    ax.set_ylabel('Frecuencia')
+    ax.set_title('Distribución de Polaridades')
+    st.pyplot(fig)
 
     # Gráfico de subjetividades
-    plt.figure(figsize=(8, 4))
-    plt.hist(subjetividades, bins=10, range=(0, 1), alpha=0.7, color='green')
-    plt.xlabel('Subjetividad')
-    plt.ylabel('Frecuencia')
-    plt.title('Distribución de Subjetividades')
-    st.pyplot()
+    fig, ax = plt.subplots()
+    ax.hist(subjetividades, bins=10, range=(0, 1), alpha=0.7, color='green')
+    ax.set_xlabel('Subjetividad')
+    ax.set_ylabel('Frecuencia')
+    ax.set_title('Distribución de Subjetividades')
+    st.pyplot(fig)
 
     return resultados
 
