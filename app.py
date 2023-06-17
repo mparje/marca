@@ -2,7 +2,7 @@ import streamlit as st
 import tweepy
 from datetime import datetime
 from textblob import TextBlob
-import matplotlib.pyplot as plt
+import pandas as pd
 
 # Función para analizar el sentimiento del texto
 def analizar_sentimiento(texto):
@@ -24,8 +24,6 @@ def buscar_informacion_marca(marca, fecha):
     api = tweepy.API(auth)
 
     resultados = []
-    polaridades = []
-    subjetividades = []
     
     # Realizar la búsqueda en Twitter
     tweets = api.search_tweets(q=marca, count=100, lang="es", tweet_mode="extended")
@@ -39,10 +37,8 @@ def buscar_informacion_marca(marca, fecha):
             texto = tweet.full_text
             polaridad, subjetividad = analizar_sentimiento(texto)
             resultados.append({"usuario": tweet.user.screen_name, "texto": texto, "polaridad": polaridad, "subjetividad": subjetividad})
-            polaridades.append(polaridad)
-            subjetividades.append(subjetividad)
 
-    return resultados, polaridades, subjetividades
+    return resultados
 
 # Configuración de la aplicación Streamlit
 st.title("Análisis de Sentimientos y Búsqueda de Información de Marcas")
@@ -51,30 +47,11 @@ fecha = st.date_input("Seleccione una fecha:")
 
 if st.button("Analizar"):
     if marca:
-        resultados, polaridades, subjetividades = buscar_informacion_marca(marca, fecha)
+        resultados = buscar_informacion_marca(marca, fecha)
         if resultados:
             st.write(f"Resultados encontrados para la marca '{marca}' en la fecha {fecha}:")
-            for resultado in resultados:
-                st.write(f"Usuario: {resultado['usuario']}")
-                st.write(f"Texto: {resultado['texto']}")
-                st.write(f"Polaridad: {resultado['polaridad']}")
-                st.write(f"Subjetividad: {resultado['subjetividad']}")
-                st.write("---")
-            
-            # Gráfico de polaridades
-            fig, ax = plt.subplots()
-            polaridades_etiquetas = ["Negativo", "Neutral", "Positivo"]
-            ax.pie([polaridades.count(-1), polaridades.count(0), polaridades.count(1)], labels=polaridades_etiquetas, autopct='%1.1f%%', startangle=90)
-            ax.set_title('Distribución de Polaridades')
-            st.pyplot(fig)
-
-            # Gráfico de subjetividades
-            fig, ax = plt.subplots()
-            subjetividades_etiquetas = ["Objetivo", "Subjetivo"]
-            ax.pie([subjetividades.count(0), subjetividades.count(1)], labels=subjetividades_etiquetas, autopct='%1.1f%%', startangle=90)
-            ax.set_title('Distribución de Subjetividades')
-            st.pyplot(fig)
-            
+            df = pd.DataFrame(resultados)
+            st.table(df)
         else:
             st.write("No se encontraron resultados para la marca y fecha especificadas.")
     else:
