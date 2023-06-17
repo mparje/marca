@@ -51,12 +51,8 @@ if st.button("Analizar"):
     if termino:
         resultados = buscar_informacion_sentimientos(termino)
         if resultados:
-            df = pd.DataFrame(resultados)
-            st.write(f"Resultados encontrados para el término '{termino}' en el día de hoy:")
-            st.dataframe(df)
-            
             # Calcular el número de tweets positivos, negativos y neutrales
-            polaridades = df["Polaridad"]
+            polaridades = [r["Polaridad"] for r in resultados]
             positivos = sum(p > 0 for p in polaridades)
             negativos = sum(p < 0 for p in polaridades)
             neutrales = sum(p == 0 for p in polaridades)
@@ -74,9 +70,9 @@ if st.button("Analizar"):
             
             # Mostrar los tweets
             st.write("Tweets encontrados:")
-            for index, row in df.iterrows():
-                st.write(f"Usuario: @{row['Usuario']}")
-                st.write(f"Tweet: {row['Texto']}")
+            for resultado in resultados:
+                st.write(f"Usuario: @{resultado['Usuario']}")
+                st.write(f"Tweet: {resultado['Texto']}")
                 st.write("----")
         else:
             st.write("No se encontraron resultados para el término especificado en el día de hoy.")
